@@ -1,21 +1,33 @@
 import os
-from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from flask import Flask, request
 
-# Cargar variables del archivo .env
-load_dotenv()
 TOKEN = os.getenv("TELEGRAM_TOKEN")
+BOT_URL = os.getenv("BOT_URL")  # URL pública de tu app en Render
 
-# Función que responde al comando /start
+app = Flask(__name__)
+
+telegram_app = ApplicationBuilder().token(TOKEN).build()
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Hola mundo!")
 
-# Crear la aplicación con el token
-app = ApplicationBuilder().token(TOKEN).build()
+telegram_app.add_handler(CommandHandler("start", start))
 
-# Añadir el comando /start
-app.add_handler(CommandHandler("start", start))
+@app.route(f"/{TOKEN}", methods=["POST"])
+def webhook():
+    update = Update.de_json(request.get_json(force=True), telegram_app.bot)
+    telegram_app.update_queue.put_nowait(update)
+    return "OK", 200
 
-# Ejecutar el bot
-app.run_polling()
+@app.route("/")
+def home():
+    return "Bot funcionando en Render", 200
+
+if __name__ == "__main__":
+    import asyncio
+    from telegram import Bot
+    bot = Bot(TOKEN)
+    asyncio.run(bot.set_webhook(f"{BOT_URL}/{TOKEN}"))
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 10000)))
