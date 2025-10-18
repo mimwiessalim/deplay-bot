@@ -9,7 +9,7 @@ import asyncio
 TOKEN = "7709737711:AAHCN8hgp27p_LSw9rLqjQhw6LffGd0swME"  # Ej: "1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ"
 
 # PON LA URL DE TU APP EN RENDER
-BOT_URL = "https://deploy-bot.onrender.com"  # La URL pública que Render te da
+BOT_URL = "https://deplay-bot.onrender.com"  # La URL pública que Render te da
 # -----------------------------
 
 # Crear la aplicación de Telegram
